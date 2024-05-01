@@ -11,8 +11,6 @@ import com.project.api.library.repository.BookRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,10 +54,10 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public Optional<BookDTO> findById(Long id) {
-Optional<BookDTO> book = bookRepository.findById(id).map(entity -> modelMapper.map(entity, BookDTO.class));
+Optional<BookDTO> bookDTO = bookRepository.findById(id).map(entity -> modelMapper.map(entity, BookDTO.class));
 
-        if(book.isPresent()){
-            return book;
+        if(bookDTO.isPresent()){
+            return bookDTO;
         }
        throw new NoResourceFoundException("¡Book width "+ id +" not found!");
     }
