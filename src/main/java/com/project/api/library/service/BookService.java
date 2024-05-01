@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    List<Book> findAll();
-  /*  Optional<Book> findById(Long id);
-    BookDTO save(Book book);
-    BookDTO update(BookDTO theEmployeeDTO);
-    void delete(int id);
-*/
+    Page<BookDTO> findAll(Pageable pageable);
+    Optional<BookDTO> findById(Long id);
+    BookDTO save(BookDTO bookDTO);
+    BookDTO update(Long id,BookDTO bookDTO);
+    void delete(Long id);
+
 }
