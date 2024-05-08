@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
                     .map(entity -> modelMapper.map(entity, MemberDTO.class))
                     .collect(Collectors.toList());
 
-            return new PageImpl<>(memberDTOS, pageable, memberPage.getTotalElements());
+            return new PageImpl<>(memberDTOS, memberPage.getPageable(), memberPage.getTotalElements());
 
         }catch (ValidateServiceException | NoResourceFoundException e){
             log.info(e.getMessage(), e);

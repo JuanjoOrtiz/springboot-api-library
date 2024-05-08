@@ -5,8 +5,6 @@ import com.project.api.library.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +19,10 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/members")
-    public ResponseEntity<Page<MemberDTO>> findAllMembers( ){
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("memberShipNumber").ascending());
-        Page<MemberDTO> MemberDTO = memberService.findAll(pageable);
+    public ResponseEntity<Page<MemberDTO>> findAllMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size ){
+        Page<MemberDTO> MemberDTO = memberService.findAll(PageRequest.of(page, size));
         return ResponseEntity.ok().body(MemberDTO);
 
     }
