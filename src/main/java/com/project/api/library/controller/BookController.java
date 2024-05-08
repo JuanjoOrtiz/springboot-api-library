@@ -1,13 +1,11 @@
 package com.project.api.library.controller;
 
 import com.project.api.library.dto.BookDTO;
-import com.project.api.library.entity.Book;
 import com.project.api.library.service.BookService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -23,9 +21,11 @@ public class BookController {
 
 
     @GetMapping("/books")
-    public ResponseEntity<Page<BookDTO>> findAllBooks( ){
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("title").ascending());
-        Page<BookDTO> books = bookService.findAll(pageable);
+    public ResponseEntity<Page<BookDTO>> findAllBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size){
+
+        Page<BookDTO> books = bookService.findAll(PageRequest.of(page, size));
         return ResponseEntity.ok().body(books);
 
     }

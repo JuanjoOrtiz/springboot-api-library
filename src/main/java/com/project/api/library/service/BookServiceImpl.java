@@ -3,7 +3,7 @@ package com.project.api.library.service;
 
 import com.project.api.library.dto.BookDTO;
 
-import com.project.api.library.entity.Book;
+import com.project.api.library.entity.*;
 import com.project.api.library.exceptions.GeneralServiceException;
 import com.project.api.library.exceptions.NoResourceFoundException;
 import com.project.api.library.exceptions.ValidateServiceException;
@@ -36,19 +36,25 @@ public class BookServiceImpl implements BookService{
         try {
             Page<Book> bookPage = bookRepository.findAll(pageable);
             List<BookDTO> bookDTOs = bookPage.getContent().stream()
-                    .map(entity -> modelMapper.map(entity, BookDTO.class))
+                    .map(entity -> {
+                        BookDTO dto = modelMapper.map(entity, BookDTO.class);
+                        dto.setAuthor(entity.getAuthor().getName());
+                        dto.setGender(entity.getGender().getName());
+                        dto.setPublisher(entity.getPublisher().getName());
+                        dto.setShelf(entity.getShelf().getNumber());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
 
-            return new PageImpl<>(bookDTOs, pageable, bookPage.getTotalElements());
+            return new PageImpl<>(bookDTOs, bookPage.getPageable(), bookPage.getTotalElements());
 
-        }catch (ValidateServiceException | NoResourceFoundException e){
+        } catch (ValidateServiceException | NoResourceFoundException e) {
             log.info(e.getMessage(), e);
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new GeneralServiceException(e.getMessage(), e);
         }
-
 
     }
 

@@ -11,6 +11,6 @@ public class BookDTO {
     private String author;
     private String publicationDate;
     private String gender;
-    private String editorial;
+    private String publisher;
     private String shelf;
 }
