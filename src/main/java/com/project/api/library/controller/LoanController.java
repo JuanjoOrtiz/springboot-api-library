@@ -5,8 +5,6 @@ import com.project.api.library.service.LoanService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +19,11 @@ public class LoanController {
     private final LoanService loanService;
 
     @GetMapping("/loans")
-    public ResponseEntity<Page<LoanDTO>> findAllMembers( ){
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("id").ascending());
-        Page<LoanDTO> loanDTO= loanService.findAll(pageable);
+    public ResponseEntity<Page<LoanDTO>> findAllMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ){
+        Page<LoanDTO> loanDTO= loanService.findAll(PageRequest.of(page, size));
         return ResponseEntity.ok().body(loanDTO);
 
     }

@@ -32,11 +32,15 @@ public class LoanServiceImpl implements LoanService {
     public Page<LoanDTO> findAll(Pageable pageable) {
         try {
             Page<Loan> loanPage = loanRepository.findAll(pageable);
-            List<LoanDTO> bookDTOs = loanPage.getContent().stream()
-                    .map(entity -> modelMapper.map(entity, LoanDTO.class))
+            List<LoanDTO> loanDTOs = loanPage.getContent().stream()
+                    .map(entity -> {
+                        LoanDTO loanDTO = modelMapper.map(entity, LoanDTO.class);
+                        loanDTO.setBook(entity.getBook().getTitle());
+                        return loanDTO;
+                    })
                     .collect(Collectors.toList());
 
-            return new PageImpl<>(bookDTOs, pageable, loanPage.getTotalElements());
+            return new PageImpl<>(loanDTOs, loanPage.getPageable(), loanPage.getTotalElements());
 
         }catch (ValidateServiceException | NoResourceFoundException e){
             log.info(e.getMessage(), e);
