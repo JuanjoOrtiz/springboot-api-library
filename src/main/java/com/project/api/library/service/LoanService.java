@@ -8,12 +8,8 @@ import java.util.Optional;
 
 public interface LoanService {
     Page<LoanDTO> findAll(Pageable pageable);
-
     Optional<LoanDTO> findById(Long id);
-
     LoanDTO save(LoanDTO loanDTO);
-
     LoanDTO update(Long id, LoanDTO loanDTO);
-
     void delete(Long id);
 }

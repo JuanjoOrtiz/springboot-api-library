@@ -53,26 +53,64 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Optional<LoanDTO> findById(Long id) {
-        Optional<LoanDTO> loanDTO = loanRepository.findById(id).map(entity -> modelMapper.map(entity, LoanDTO.class));
+        Optional<LoanDTO> loanDTO = loanRepository.findById(id)
+                .map(entity -> {
+                    LoanDTO dto = modelMapper.map(entity, LoanDTO.class);
+                    dto.setBook(entity.getBook().getTitle());
+                    return dto;
+                });
+
 
         if(loanDTO.isPresent()){
+
             return loanDTO;
         }
-        throw new NoResourceFoundException("¡Book width "+ id +" not found!");
+        throw new NoResourceFoundException("¡Loan with "+ id +" not found!");
     }
 
     @Override
     public LoanDTO save(LoanDTO loanDTO) {
-        return null;
+        // Convertir DTO a entidad
+       Loan loan = modelMapper.map(loanDTO, Loan.class);
+
+        // Guardar entidad en la base de datos
+        loan = loanRepository.save(loan); // Aquí estaba el error
+
+        // Convertir entidad guardada a DTO
+        LoanDTO savedLoanDTO = modelMapper.map(loan, LoanDTO.class);
+
+
+        return savedLoanDTO;
     }
 
     @Override
     public LoanDTO update(Long id, LoanDTO loanDTO) {
-        return null;
+
+        // Buscar el pretamo en la base de datos
+        Loan loan= loanRepository.findById(id)
+                .orElseThrow(() -> new NoResourceFoundException("Member with "+ id +" not found"));
+
+        // Configurar ModelMapper para ignorar el campo 'id'
+        modelMapper.typeMap(LoanDTO.class, Loan.class).addMappings(mapper -> mapper.skip(Loan::setId));
+
+        // Actualizar el libro con los datos del DTO
+        modelMapper.map(loanDTO, loan);
+
+        // Guardar el libro actualizado en la base de datos
+        loanRepository.save(loan);
+
+        // Convertir el libro actualizado a DTO
+       LoanDTO updatedLoanDTO = modelMapper.map(loan, LoanDTO.class);
+
+        return updatedLoanDTO;
+
+
     }
 
     @Override
     public void delete(Long id) {
-
+        Loan loan =  loanRepository.findById(id)
+                .orElseThrow(() -> new NoResourceFoundException("Loan "+ id +" not found"));
+        loanRepository.delete(loan);
     }
 }
