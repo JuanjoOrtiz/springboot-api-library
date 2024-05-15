@@ -1,2 +1,3 @@
-package com.project.api.library.mapper;public class BookMapper {
+package com.project.api.library.mapper;
+public class BookMapper {
 }
