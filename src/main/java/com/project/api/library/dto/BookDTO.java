@@ -2,16 +2,21 @@ package com.project.api.library.dto;
 
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class BookDTO {
 
     private Long id;
     private String isbn;
     private String title;
-    private String author;
+    private AuthorDTO author;
     private String publicationDate;
-    private String gender;
-    private String publisher;
-    private String shelf;
+    private GenderDTO gender;
+    private PublisherDTO publisher;
+    private ShelfDTO shelf;
+
+
+
 }
