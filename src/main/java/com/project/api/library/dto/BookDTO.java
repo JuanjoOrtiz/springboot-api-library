@@ -1,18 +1,22 @@
 package com.project.api.library.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookDTO {
 
     private Long id;
     private String isbn;
     private String title;
     private AuthorDTO author;
-    private String publicationDate;
+    private LocalDateTime publicationDate;
     private GenderDTO gender;
     private PublisherDTO publisher;
     private ShelfDTO shelf;
