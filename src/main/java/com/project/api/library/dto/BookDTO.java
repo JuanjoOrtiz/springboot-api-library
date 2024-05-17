@@ -21,6 +21,9 @@ public class BookDTO {
     private PublisherDTO publisher;
     private ShelfDTO shelf;
 
+    public BookDTO(String title) {
+        this.title = title;
+    }
 
 
 }

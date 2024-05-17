@@ -1,12 +1,16 @@
 package com.project.api.library.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberDTO {
     private Long id;
 
-    private String membershipnumber;
+    private String memberShipNumber;
 
     private String name;
 
@@ -22,4 +26,7 @@ public class MemberDTO {
 
     private String province;
 
+    public MemberDTO(String memberShipNumber) {
+        this.memberShipNumber = memberShipNumber;
+    }
 }

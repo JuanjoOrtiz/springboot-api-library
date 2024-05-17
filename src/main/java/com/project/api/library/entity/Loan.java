@@ -29,9 +29,11 @@ public class Loan {
     private Member member;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Column(name = "loan_date")
     private LocalDateTime loanDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Column(name = "return_date")
     private LocalDateTime returnDate;
 
 }
