@@ -2,9 +2,7 @@ package com.project.api.library.service;
 
 import com.project.api.library.dto.LoanDTO;
 import com.project.api.library.entity.Loan;
-import com.project.api.library.exceptions.GeneralServiceException;
-import com.project.api.library.exceptions.NoResourceFoundException;
-import com.project.api.library.exceptions.ValidateServiceException;
+import com.project.api.library.exceptions.ResourceNotFoundException;
 import com.project.api.library.repository.LoanRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Page<LoanDTO> findAll(Pageable pageable) {
-        try {
+     //   try {
             Page<Loan> loanPage = loanRepository.findAll(pageable);
             List<LoanDTO> loanDTOs = loanPage.getContent().stream()
                     .map(entity -> {
@@ -42,13 +40,13 @@ public class LoanServiceImpl implements LoanService {
 
             return new PageImpl<>(loanDTOs, loanPage.getPageable(), loanPage.getTotalElements());
 
-        }catch (ValidateServiceException | NoResourceFoundException e){
+       /* }catch (ValidateServiceException | NoResourceFoundException e){
             log.info(e.getMessage(), e);
             throw e;
         }catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new GeneralServiceException(e.getMessage(), e);
-        }
+        }*/
     }
 
     @Override
@@ -58,7 +56,7 @@ public class LoanServiceImpl implements LoanService {
         if(loanDTO.isPresent()){
             return loanDTO;
         }
-        throw new NoResourceFoundException("¡Book width "+ id +" not found!");
+        throw new ResourceNotFoundException("¡Book width "+ id +" not found!");
     }
 
     @Override

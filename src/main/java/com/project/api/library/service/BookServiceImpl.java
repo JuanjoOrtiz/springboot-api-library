@@ -85,91 +85,106 @@ Optional<BookDTO> bookDTO = bookRepository.findById(id).map(entity -> modelMappe
        throw new ResourceNotFoundException("¡Book with "+ id +" not found!");
     }
 
-   @Override
+    @Override
     public BookDTO save(BookDTO bookDTO) {
-       // Convertir DTO a entidad
-       Book book = modelMapper.map(bookDTO, Book.class);
+        // Convertir DTO a entidad
+        Book book = modelMapper.map(bookDTO, Book.class);
 
-       // Si el libro tiene un autor, asegúrate de que también se guarde
-      if (book.getAuthor() != null && book.getAuthor().getName() != null) {
-           Author existingAuthor = authorRepository.findByName(book.getAuthor().getName());
-           if (existingAuthor == null) {
-               authorRepository.save(book.getAuthor());
-           } else {
-               book.setAuthor(existingAuthor);
-           }
-       }
+        // Si el libro tiene un autor, asegúrate de que también se guarde
+        if (book.getAuthor() != null && book.getAuthor().getName() != null) {
+            Author existingAuthor = authorRepository.findByName(book.getAuthor().getName());
+            if (existingAuthor == null) {
+                authorRepository.save(book.getAuthor());
+            } else {
+                book.setAuthor(existingAuthor);
+            }
+        }
 
-      // Si el libro tiene un genero, asegúrate de que también se guarde
-       if (book.getGender() != null && book.getGender().getName() != null) {
-           Gender existingGender = genderRepository.findByName(book.getGender().getName());
-           if (existingGender == null) {
-               genderRepository.save(book.getGender());
-           } else {
-               book.setGender(existingGender);
-           }
-       }
-       // Si el libro tiene un editorial, asegúrate de que también se guarde
-       if (book.getPublisher() != null && book.getPublisher().getName() != null) {
-           Publisher existingPublisher =  publisherRepository.findByName(book.getPublisher().getName());
-           if (existingPublisher == null) {
-               publisherRepository.save(book.getPublisher());
-           } else {
-               book.setPublisher(existingPublisher);
-           }
-       }
-       // Si el libro tiene un autor, asegúrate de que también se guardeif (book.getShelf() != null && book.getShelf().getCode() != null) {
-       if (book.getShelf() != null && book.getShelf().getCode() != null) {
-           Shelf existingShelf = shelfRepository.findByCode(book.getShelf().getCode());
-           if (existingShelf == null) {
-               shelfRepository.save(book.getShelf());
-           } else {
-               book.setShelf(existingShelf);
-           }
-       }
 
-       // Guardar entidad en la base de datos
-       book = bookRepository.save(book); // save the book entity
+        if (book.getGender() != null && book.getGender().getName() != null) {
+            Gender existingGender = genderRepository.findByName(book.getGender().getName());
+            if (existingGender == null) {
+                genderRepository.save(book.getGender());
+            } else {
+                book.setGender(existingGender);
+            }
+        }
 
-       // Convertir la entidad de libro devuelta a DTO
-       BookDTO bookDTOUpdated = modelMapper.map(book, BookDTO.class);
+        if (book.getPublisher() != null && book.getPublisher().getName() != null) {
+            Publisher existingPublisher =  publisherRepository.findByName(book.getPublisher().getName());
+            if (existingPublisher == null) {
+                publisherRepository.save(book.getPublisher());
+            } else {
+                book.setPublisher(existingPublisher);
+            }
+        }
+        // Si el libro tiene una estantería, asegúrate de que también se guarde
+        if (book.getShelf() != null && book.getShelf().getCode() != null) {
+            Shelf existingShelf = shelfRepository.findByCode(book.getShelf().getCode());
+            if (existingShelf == null) {
+                shelfRepository.save(book.getShelf());
+            } else {
+                book.setShelf(existingShelf);
+            }
+        }
+        // Guardar entidad en la base de datos
+        book = bookRepository.save(book); // save the book entity
 
-       return bookDTOUpdated; // return the updated DTO
+        // Convertir la entidad de libro devuelta a DTO
+        BookDTO bookDTOUpdated = modelMapper.map(book, BookDTO.class);
+
+        return bookDTOUpdated; // return the updated DTO
     }
 
     @Override
     public BookDTO update(Long id, BookDTO bookDTO) {
-        // Buscar el libro en la base de datos
+        // Configurar ModelMapper para ignorar el campo 'id'
+        modelMapper.typeMap(BookDTO.class, Book.class).addMappings(mapper -> {
+            mapper.skip(Book::setId);
+            mapper.skip(Book::setAuthor);
+            mapper.skip(Book::setGender);
+            mapper.skip(Book::setPublisher);
+            mapper.skip(Book::setShelf);
+        });
+
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book "+ id +" not found"));
 
-        Author author = authorRepository.findById(bookDTO.getAuthor().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Author "+ bookDTO.getAuthor().getId() +" not found"));
-
-        // Buscar el gender en la base de datos
-        Gender gender = genderRepository.findById(bookDTO.getGender().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Gender "+ bookDTO.getGender().getId() +" not found"));
-
-        Publisher publisher = publisherRepository.findById(bookDTO.getPublisher().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Publisher "+ bookDTO.getPublisher().getId() +" not found"));
-
-        Shelf shelf = shelfRepository.findById(bookDTO.getShelf().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Shelf "+ bookDTO.getShelf().getId() +" not found"));
-
-        // Configurar ModelMapper para ignorar el campo 'id'
-       modelMapper.typeMap(BookDTO.class, Book.class).addMappings(mapper ->{
-           mapper.skip(Book::setId);
-           mapper.skip(Book::setAuthor);
-           mapper.skip(Book::setGender);
-           mapper.skip(Book::setPublisher);
-           mapper.skip(Book::setShelf);
-
-       });
-
+        Author author = authorRepository.findByName(bookDTO.getAuthor().getName());
+        if (author == null) {
+            Author newAuthor = new Author();
+            newAuthor.setName(bookDTO.getAuthor().getName());
+            author = authorRepository.save(newAuthor);
+        }
         book.setAuthor(author);
+
+
+
+        Gender gender = genderRepository.findByName(bookDTO.getGender().getName());
+        if (gender == null) {
+            Gender newGender = new Gender();
+            newGender.setName(bookDTO.getGender().getName());
+            gender = genderRepository.save(newGender);
+        }
         book.setGender(gender);
+
+        Publisher publisher = publisherRepository.findByName(bookDTO.getPublisher().getName());
+        if (publisher == null) {
+            Publisher newPublisher = new Publisher();
+            newPublisher.setName(bookDTO.getPublisher().getName());
+            publisher = publisherRepository.save(newPublisher);
+        }
         book.setPublisher(publisher);
+
+
+        Shelf shelf = shelfRepository.findByCode(bookDTO.getShelf().getCode());
+        if (shelf == null) {
+            Shelf newShelf = new Shelf();
+            newShelf.setCode(bookDTO.getShelf().getCode());
+            shelf = shelfRepository.save(newShelf);
+        }
         book.setShelf(shelf);
+
 
         // Guardar el libro actualizado en la base de datos
         bookRepository.save(book);
@@ -180,10 +195,17 @@ Optional<BookDTO> bookDTO = bookRepository.findById(id).map(entity -> modelMappe
         return updatedBookDTO;
     }
 
-  @Override
+
+    @Override
     public void delete(Long id) {
         Book book =  bookRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Book "+ id +" not found"));
-        bookRepository.delete(book);
+                .orElseThrow(() -> new ResourceNotFoundException("Book "+ id +" not found")); // Si el libro no se encuentra, lanza una excepción
+        book.setAuthor(null);
+        book.setGender(null);
+        book.setPublisher(null);
+        book.setShelf(null);
+        bookRepository.save(book); // Guarda el libro con el author_id establecido a null
+
+        bookRepository.delete(book); // Si el libro se encuentra, lo elimina del repositorio
     }
 }

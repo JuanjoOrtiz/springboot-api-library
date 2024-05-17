@@ -3,9 +3,7 @@ package com.project.api.library.service;
 
 import com.project.api.library.dto.MemberDTO;
 import com.project.api.library.entity.Member;
-import com.project.api.library.exceptions.GeneralServiceException;
-import com.project.api.library.exceptions.NoResourceFoundException;
-import com.project.api.library.exceptions.ValidateServiceException;
+import com.project.api.library.exceptions.ResourceNotFoundException;
 import com.project.api.library.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Page<MemberDTO> findAll(Pageable pageable) {
 
-        try {
+     //   try {
             Page<Member> memberPage = memberRepository.findAll(pageable);
             List<MemberDTO> memberDTOS = memberPage.getContent().stream()
                     .map(entity -> modelMapper.map(entity, MemberDTO.class))
@@ -40,13 +38,13 @@ public class MemberServiceImpl implements MemberService {
 
             return new PageImpl<>(memberDTOS, memberPage.getPageable(), memberPage.getTotalElements());
 
-        }catch (ValidateServiceException | NoResourceFoundException e){
+       /* }catch (ValidateServiceException | NoResourceFoundException e){
             log.info(e.getMessage(), e);
             throw e;
         }catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new GeneralServiceException(e.getMessage(), e);
-        }
+        }*/
     }
 
     @Override
@@ -56,7 +54,7 @@ public class MemberServiceImpl implements MemberService {
         if(memberDTO.isPresent()){
             return memberDTO;
         }
-        throw new NoResourceFoundException("¡Member with "+ id +" not found!");
+        throw new ResourceNotFoundException("¡Member with "+ id +" not found!");
     }
 
     @Override
@@ -80,7 +78,7 @@ public class MemberServiceImpl implements MemberService {
 
         // Buscar el libro en la base de datos
         Member  member= memberRepository.findById(id)
-                .orElseThrow(() -> new NoResourceFoundException("Member with "+ id +" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member with "+ id +" not found"));
 
         // Configurar ModelMapper para ignorar el campo 'id'
         modelMapper.typeMap(MemberDTO.class, Member.class).addMappings(mapper -> mapper.skip(Member::setId));
@@ -100,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void delete(Long id) {
        Member member =  memberRepository.findById(id)
-                .orElseThrow(() -> new NoResourceFoundException("Member "+ id +" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member "+ id +" not found"));
         memberRepository.delete(member);
     }
 }
