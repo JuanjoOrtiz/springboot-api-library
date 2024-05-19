@@ -2,6 +2,7 @@ package com.project.api.library.controller;
 
 import com.project.api.library.dto.BookDTO;
 import com.project.api.library.service.BookService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,14 +37,14 @@ public class BookController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<BookDTO> save(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> save(@Valid @RequestBody BookDTO bookDTO) {
         BookDTO savedBookDTO = bookService.save(bookDTO);
         return ResponseEntity.ok().body(savedBookDTO);
 
     }
 
     @PutMapping("/book/{id}")
-    public ResponseEntity<BookDTO> update(@PathVariable Long id, @RequestBody BookDTO bookDTO){
+    public ResponseEntity<BookDTO> update(@PathVariable Long id,@Valid  @RequestBody BookDTO bookDTO){
         bookDTO = bookService.update(id, bookDTO);
         return ResponseEntity.ok().body(bookDTO);
     }

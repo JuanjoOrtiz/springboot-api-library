@@ -2,6 +2,7 @@ package com.project.api.library.controller;
 
 import com.project.api.library.dto.MemberDTO;
 import com.project.api.library.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,14 +34,14 @@ public class MemberController {
     }
 
     @PostMapping("/member")
-    public ResponseEntity<MemberDTO> save(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<MemberDTO> save(@Valid  @RequestBody MemberDTO memberDTO) {
         MemberDTO savedMemberDTO = memberService.save(memberDTO);
         return ResponseEntity.ok().body(savedMemberDTO);
 
     }
 
     @PutMapping("/member/{id}")
-    public ResponseEntity<MemberDTO> update(@PathVariable Long id, @RequestBody MemberDTO memberDTO){
+    public ResponseEntity<MemberDTO> update(@PathVariable Long id,@Valid  @RequestBody MemberDTO memberDTO){
         memberDTO = memberService.update(id, memberDTO);
         return ResponseEntity.ok().body(memberDTO);
     }

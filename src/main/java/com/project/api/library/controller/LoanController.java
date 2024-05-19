@@ -2,6 +2,7 @@ package com.project.api.library.controller;
 
 import com.project.api.library.dto.LoanDTO;
 import com.project.api.library.service.LoanService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,14 +35,14 @@ public class LoanController {
     }
 
     @PostMapping("/loan")
-    public ResponseEntity<LoanDTO> save(@RequestBody LoanDTO loanDTO) {
+    public ResponseEntity<LoanDTO> save(@Valid @RequestBody LoanDTO loanDTO) {
         LoanDTO savedLoanDTO = loanService.save(loanDTO);
         return ResponseEntity.ok().body(savedLoanDTO);
 
     }
 
     @PutMapping("/loan/{id}")
-    public ResponseEntity<LoanDTO> update(@PathVariable Long id, @RequestBody LoanDTO loanDTO){
+    public ResponseEntity<LoanDTO> update(@PathVariable Long id,@Valid  @RequestBody LoanDTO loanDTO){
         loanDTO = loanService.update(id, loanDTO);
         return ResponseEntity.ok().body(loanDTO);
     }

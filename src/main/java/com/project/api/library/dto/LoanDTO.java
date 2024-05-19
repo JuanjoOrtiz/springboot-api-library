@@ -1,21 +1,22 @@
 package com.project.api.library.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoanDTO {
 
-
-    private Long id;
-    private BookDTO book;
-    private MemberDTO member;
+    @NotNull
+    private String book;
+    @NotNull
+    private String memberShipNumber;
+    @NotNull
     private LocalDateTime loanDate;
+    @NotNull
     private LocalDateTime returnDate;
 
 }
