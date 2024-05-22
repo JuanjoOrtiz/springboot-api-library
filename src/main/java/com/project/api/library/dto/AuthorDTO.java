@@ -1,19 +1,18 @@
 package com.project.api.library.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthorDTO {
-    private Long id;
+
+    @NotNull
+    @NotBlank(message = "Author is required")
     private String name;
 
-    public AuthorDTO(Long id) {
-        this.id = id;
-    }
 
     public AuthorDTO(String name) {
         this.name = name;

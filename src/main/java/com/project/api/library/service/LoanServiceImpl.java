@@ -67,16 +67,16 @@ public class LoanServiceImpl implements LoanService {
         Loan loan = modelMapper.map(loanDTO, Loan.class);
 
         // Rellenar member y book
-      Member member = memberRepository.findByMemberShipNumber(loanDTO.getMember().getMemberShipNumber())
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + loanDTO.getMember().getMemberShipNumber()));
-        Book book = bookRepository.findByTitle(loanDTO.getBook().getTitle())
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBook().getTitle()));
+      Member member = memberRepository.findByMemberShipNumber(loanDTO.getMemberShipNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + loanDTO.getMemberShipNumber()));
+        Book book = bookRepository.findByTitle(loanDTO.getBook())
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBook()));
 
         loan.setMember(member);
         loan.setBook(book);
 
         // Comprobar si ya existe un préstamo para el libro
-        Loan existingLoan = loanRepository.findByBookTitle(loanDTO.getBook().getTitle());
+        Loan existingLoan = loanRepository.findByBookTitle(loanDTO.getBook());
         if (existingLoan != null) {
             throw new IllegalStateException("Ya existe un préstamo para el libro con el título " + book.getTitle());
         }
@@ -92,8 +92,6 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanDTO update(Long id, LoanDTO loanDTO) {
-
-
         // Buscar el préstamo en la base de datos
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Préstamo con id " + id + " no encontrado"));
@@ -101,13 +99,22 @@ public class LoanServiceImpl implements LoanService {
         // Configurar ModelMapper para ignorar el campo 'id'
         modelMapper.typeMap(LoanDTO.class, Loan.class).addMappings(mapper -> mapper.skip(Loan::setId));
 
+        // Rellenar member y book
+        Member member = memberRepository.findByMemberShipNumber(loanDTO.getMemberShipNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + loanDTO.getMemberShipNumber()));
+        Book book = bookRepository.findByTitle(loanDTO.getBook())
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBook()));
+
+        loan.setMember(member);
+        loan.setBook(book);
+
         // Actualizar el préstamo con los datos del DTO
         modelMapper.map(loanDTO, loan);
 
         // Comprobar si ya existe un préstamo para el libro
-        Loan existingLoan = loanRepository.findByBookTitle(loanDTO.getBook().getTitle());
+        Loan existingLoan = loanRepository.findByBookTitle(book.getTitle());
         if (existingLoan != null && !existingLoan.getId().equals(id)) {
-            throw new IllegalStateException("Ya existe un préstamo para el libro con el título " + loanDTO.getBook().getTitle());
+            throw new IllegalStateException("Ya existe un préstamo para el libro con el título " + book.getTitle());
         }
 
         // Guardar el préstamo actualizado en la base de datos
@@ -117,7 +124,6 @@ public class LoanServiceImpl implements LoanService {
         LoanDTO updatedLoanDTO = modelMapper.map(loan, LoanDTO.class);
 
         return updatedLoanDTO;
-
 
     }
 

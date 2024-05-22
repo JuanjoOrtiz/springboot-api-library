@@ -1,19 +1,16 @@
 package com.project.api.library.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ShelfDTO {
-    private Long id;
+    @NotNull
+    @NotBlank(message = "Shelf is required")
     private String code;
-
-    public ShelfDTO(Long id) {
-        this.id = id;
-    }
 
     public ShelfDTO(String code) {
         this.code = code;
