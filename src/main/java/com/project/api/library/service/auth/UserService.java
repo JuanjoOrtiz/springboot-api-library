@@ -18,10 +18,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-        private final UserRepository userRepository;
-        private final RoleRepository roleRepository;
-        private final PasswordEncoder passwordEncoder;
-
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> allUsers() {
         List<User> users = new ArrayList<>();
@@ -38,11 +37,11 @@ public class UserService {
             return null;
         }
 
-        var user = new User()
-                .setFullName(input.getFullName())
-                .setEmail(input.getEmail())
-                .setPassword(passwordEncoder.encode(input.getPassword()))
-                .setRole(optionalRole.get());
+        var user = new User();
+        user.setFullName(input.getFullName());
+        user.setEmail(input.getEmail());
+        user.setPassword(passwordEncoder.encode(input.getPassword()));
+        user.setRole(optionalRole.get());
 
         return userRepository.save(user);
     }

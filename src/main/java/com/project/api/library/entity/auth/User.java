@@ -48,35 +48,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 
-
-
-    public User setFullName(String fullName) {
-        this.fullName = fullName;
-        return this;
-    }
-
-
-    public User setEmail(String email) {
-        this.email = email;
-        return this;
-    }
-
-    public User setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public User setRole(Role role) {
-        this.role = role;
-
-        return this;
-    }
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());

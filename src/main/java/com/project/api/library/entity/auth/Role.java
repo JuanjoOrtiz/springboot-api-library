@@ -35,13 +35,5 @@ public class Role {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    public Role setName(RoleEnum name) {
-        this.name = name;
-        return this;
-    }
 
-    public Role setDescription(String description) {
-        this.description = description;
-        return this;
-    }
 }
