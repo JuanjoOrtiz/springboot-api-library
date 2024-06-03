@@ -4,6 +4,7 @@ package com.project.api.library.service;
 import com.project.api.library.dto.MemberDTO;
 import com.project.api.library.entity.Member;
 import com.project.api.library.exceptions.ResourceNotFoundException;
+import com.project.api.library.exceptions.SaveErrorException;
 import com.project.api.library.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,81 +24,68 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
+    private static final String NOT_FOUND = " not found!";
+
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public Page<MemberDTO> findAll(Pageable pageable) {
-
-     //   try {
+        try {
             Page<Member> memberPage = memberRepository.findAll(pageable);
             List<MemberDTO> memberDTOS = memberPage.getContent().stream()
                     .map(entity -> modelMapper.map(entity, MemberDTO.class))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return new PageImpl<>(memberDTOS, memberPage.getPageable(), memberPage.getTotalElements());
 
-       /* }catch (ValidateServiceException | NoResourceFoundException e){
+        } catch (ResourceNotFoundException e) {
             log.info(e.getMessage(), e);
-            throw e;
-        }catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new GeneralServiceException(e.getMessage(), e);
-        }*/
+            throw new ResourceNotFoundException("Members " + NOT_FOUND);
+        }
     }
 
     @Override
     public Optional<MemberDTO> findById(Long id) {
-        Optional<MemberDTO> memberDTO = memberRepository.findById(id).map(entity -> modelMapper.map(entity, MemberDTO.class));
-
-        if(memberDTO.isPresent()){
-            return memberDTO;
-        }
-        throw new ResourceNotFoundException("¡Member with "+ id +" not found!");
+        return Optional.ofNullable(memberRepository.findById(id)
+                .map(entity -> modelMapper.map(entity, MemberDTO.class))
+                .orElseThrow(() -> new ResourceNotFoundException("¡Member with " + id + NOT_FOUND)));
     }
 
     @Override
-    public MemberDTO save(MemberDTO MemberDTO) {
-
-        // Convertir DTO a entidad
-        Member  member = modelMapper.map(MemberDTO, Member.class);
-
-        // Guardar entidad en la base de datos
-        member = memberRepository.save(member); // Aquí estaba el error
-
-        // Convertir entidad guardada a DTO
-        MemberDTO savedMemberDTO = modelMapper.map(member, MemberDTO.class);
-
-
-        return savedMemberDTO;
+    public MemberDTO save(MemberDTO memberDTO) {
+        try {
+            Member member = modelMapper.map(memberDTO, Member.class);
+            member = memberRepository.save(member);
+            return modelMapper.map(member, MemberDTO.class);
+        } catch (SaveErrorException e) {
+            throw new SaveErrorException("Failed to save the book: " + e.getMessage());
+        }
     }
 
     @Override
     public MemberDTO update(Long id, MemberDTO memberDTO) {
+        try {
 
-        // Buscar el libro en la base de datos
-        Member  member= memberRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Member with "+ id +" not found"));
+            Member member = memberRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Member with " + id + " not found"));
 
-        // Configurar ModelMapper para ignorar el campo 'id'
-        modelMapper.typeMap(MemberDTO.class, Member.class).addMappings(mapper -> mapper.skip(Member::setId));
+            modelMapper.typeMap(MemberDTO.class, Member.class).addMappings(mapper -> mapper.skip(Member::setId));
 
-        // Actualizar el libro con los datos del DTO
-        modelMapper.map(memberDTO, member);
+            modelMapper.map(memberDTO, member);
 
-        // Guardar el libro actualizado en la base de datos
-        memberRepository.save(member);
+            memberRepository.save(member);
 
-        // Convertir el libro actualizado a DTO
-        MemberDTO updatedMemberDTO = modelMapper.map(member, MemberDTO.class);
-
-        return updatedMemberDTO;
+            return modelMapper.map(member, MemberDTO.class);
+        } catch (SaveErrorException e) {
+            throw new SaveErrorException("Failed to update the member: " + e.getMessage());
+        }
     }
 
     @Override
     public void delete(Long id) {
-       Member member =  memberRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Member "+ id +" not found"));
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Member " + id + " not found"));
         memberRepository.delete(member);
     }
 }

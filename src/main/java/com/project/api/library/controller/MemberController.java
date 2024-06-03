@@ -29,7 +29,7 @@ public class MemberController {
     }
 
     @GetMapping("/member/{id}")
-    public Optional<MemberDTO> findById(@PathVariable Long id){
+    public Optional<MemberDTO> findById(@PathVariable("id") Long id){
         return memberService.findById(id);
     }
 
@@ -41,15 +41,15 @@ public class MemberController {
     }
 
     @PutMapping("/member/{id}")
-    public ResponseEntity<MemberDTO> update(@PathVariable Long id,@Valid  @RequestBody MemberDTO memberDTO){
+    public ResponseEntity<MemberDTO> update(@PathVariable("id") Long id,@Valid  @RequestBody MemberDTO memberDTO){
         memberDTO = memberService.update(id, memberDTO);
         return ResponseEntity.ok().body(memberDTO);
     }
 
     @DeleteMapping("/member/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id){
         memberService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
