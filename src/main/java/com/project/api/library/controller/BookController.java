@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,35 +25,34 @@ public class BookController {
     @GetMapping("/books")
     public ResponseEntity<Page<BookDTO>> findAllBooks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size){
+            @RequestParam(defaultValue = "50") int size) {
 
         Page<BookDTO> books = bookService.findAll(PageRequest.of(page, size));
         return ResponseEntity.ok().body(books);
-
     }
 
     @GetMapping("/book/{id}")
-    public Optional<BookDTO> findById(@PathVariable Long id){
-        return bookService.findById(id);
+    public Optional<ResponseEntity<BookDTO>> findById(@PathVariable Long id) {
+        Optional<BookDTO> book = bookService.findById(id);
+        return book.map(bookDTO -> new ResponseEntity<>(bookDTO, HttpStatus.OK));
     }
 
     @PostMapping("/book")
     public ResponseEntity<BookDTO> save(@Valid @RequestBody BookDTO bookDTO) {
         BookDTO savedBookDTO = bookService.save(bookDTO);
         return ResponseEntity.ok().body(savedBookDTO);
-
     }
 
     @PutMapping("/book/{id}")
-    public ResponseEntity<BookDTO> update(@PathVariable Long id,@Valid  @RequestBody BookDTO bookDTO){
-        bookDTO = bookService.update(id, bookDTO);
-        return ResponseEntity.ok().body(bookDTO);
+    public ResponseEntity<BookDTO> update(@PathVariable("id") Long id, @Valid @RequestBody BookDTO bookDTO) {
+            bookDTO = bookService.update(id, bookDTO);
+            return ResponseEntity.ok().body(bookDTO);
     }
 
     @DeleteMapping("/book/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         bookService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }
