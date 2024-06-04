@@ -29,12 +29,7 @@ public class BookDTO {
     @NotNull
     private PublisherDTO publisher;
     @NotNull
-
     private ShelfDTO shelf;
-
-    public BookDTO(String title) {
-        this.title = title;
-    }
 
 
 }

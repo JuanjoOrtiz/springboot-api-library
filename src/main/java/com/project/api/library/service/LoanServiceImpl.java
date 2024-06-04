@@ -19,13 +19,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class LoanServiceImpl implements LoanService {
+
+    private static final String NOT_FOUND = " not found!";
 
     private final LoanRepository loanRepository;
     private final MemberRepository memberRepository;
@@ -34,61 +35,62 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Page<LoanDTO> findAll(Pageable pageable) {
-
+        try {
             Page<Loan> loanPage = loanRepository.findAll(pageable);
             List<LoanDTO> loanDTOs = loanPage.getContent().stream()
                     .map(entity -> {
-                        LoanDTO loanDTO = modelMapper.map(entity, LoanDTO.class);
-
-                        return loanDTO;
-                    })
-                    .collect(Collectors.toList());
+                        LoanDTO loans = modelMapper.map(entity, LoanDTO.class);
+                        return loans;
+                    }).toList();
 
             return new PageImpl<>(loanDTOs, loanPage.getPageable(), loanPage.getTotalElements());
+        } catch (ResourceNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new ResourceNotFoundException("Loans " + NOT_FOUND);
+        }
     }
 
-    @Override
+   @Override
     public Optional<LoanDTO> findById(Long id) {
-        Optional<LoanDTO> loanDTO = loanRepository.findById(id)
-                .map(entity ->  modelMapper.map(entity, LoanDTO.class));
-
-
-                    if(loanDTO.isPresent() ){
-                        return loanDTO;
-                    }
-
-                throw new ResourceNotFoundException("¡Loan with "+ id +" not found!");
+        return Optional.ofNullable(loanRepository.findById(id)
+                .map(loan -> modelMapper.map(loan, LoanDTO.class))
+                .orElseThrow(() -> new ResourceNotFoundException("¡Loan with id" + id + NOT_FOUND)));
 
     }
-
     @Override
     public LoanDTO save(LoanDTO loanDTO) {
         // Convertir DTO a entidad
         Loan loan = modelMapper.map(loanDTO, Loan.class);
 
-        // Rellenar member y book
-      Member member = memberRepository.findByMemberShipNumber(loanDTO.getMemberShipNumber())
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + loanDTO.getMemberShipNumber()));
-        Book book = bookRepository.findByTitle(loanDTO.getBook())
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBook()));
+        // Almacenar el número de socio en una variable final
+        final String memberShipNumber = loan.getMember().getMemberShipNumber();
+        final String title = loan.getBook() != null ? loan.getBook().getTitle() : null;
 
+        // Verificar si el miembro existe
+        Member member = memberRepository.findByMemberShipNumber(memberShipNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + memberShipNumber));
         loan.setMember(member);
-        loan.setBook(book);
 
-        // Comprobar si ya existe un préstamo para el libro
-        Loan existingLoan = loanRepository.findByBookTitle(loanDTO.getBook());
-        if (existingLoan != null) {
-            throw new IllegalStateException("Ya existe un préstamo para el libro con el título " + book.getTitle());
+        // Verificar si el libro existe y si ya está prestado
+        if (title != null && !title.isEmpty()) {
+            Book book = bookRepository.findByTitle(title)
+                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + title));
+            Optional<Loan> existingLoan = loanRepository.findByBookTitle(title);
+            if (existingLoan.isPresent()) {
+                throw new IllegalStateException("El libro con el título " + title + " ya está prestado");
+            }
+            loan.setBook(book);
+        } else {
+            throw new IllegalArgumentException("El título del libro en el préstamo no puede ser null o vacío");
         }
 
-        // Guardar entidad en la base de datos
+        // Guardar el préstamo
         loan = loanRepository.save(loan);
 
-        // Convertir entidad guardada a DTO
-        LoanDTO savedLoanDTO = modelMapper.map(loan, LoanDTO.class);
-
-        return savedLoanDTO;
+        // Convertir entidad a DTO y devolver
+        return modelMapper.map(loan, LoanDTO.class);
     }
+
 
     @Override
     public LoanDTO update(Long id, LoanDTO loanDTO) {
@@ -99,38 +101,40 @@ public class LoanServiceImpl implements LoanService {
         // Configurar ModelMapper para ignorar el campo 'id'
         modelMapper.typeMap(LoanDTO.class, Loan.class).addMappings(mapper -> mapper.skip(Loan::setId));
 
-        // Rellenar member y book
+        // Verificar si el miembro existe
         Member member = memberRepository.findByMemberShipNumber(loanDTO.getMemberShipNumber())
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró un miembro con el número de socio " + loanDTO.getMemberShipNumber()));
-        Book book = bookRepository.findByTitle(loanDTO.getBook())
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBook()));
-
         loan.setMember(member);
-        loan.setBook(book);
+
+        // Verificar si el libro existe y si ya está prestado
+        if (loanDTO.getBookTitle() != null && !loanDTO.getBookTitle().isEmpty()) {
+            Book book = bookRepository.findByTitle(loanDTO.getBookTitle())
+                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró un libro con el titulo " + loanDTO.getBookTitle()));
+            Optional<Loan> existingLoan = loanRepository.findByBookTitle(loanDTO.getBookTitle());
+            if (existingLoan.isPresent() && !existingLoan.get().getId().equals(id)) {
+                throw new IllegalStateException("El libro con el título " + loanDTO.getBookTitle() + " ya está prestado");
+            }
+            loan.setBook(book);
+        } else {
+            throw new IllegalArgumentException("El título del libro en el préstamo no puede ser null o vacío");
+        }
 
         // Actualizar el préstamo con los datos del DTO
         modelMapper.map(loanDTO, loan);
 
-        // Comprobar si ya existe un préstamo para el libro
-        Loan existingLoan = loanRepository.findByBookTitle(book.getTitle());
-        if (existingLoan != null && !existingLoan.getId().equals(id)) {
-            throw new IllegalStateException("Ya existe un préstamo para el libro con el título " + book.getTitle());
-        }
-
-        // Guardar el préstamo actualizado en la base de datos
+        // Guardar el préstamo
         loanRepository.save(loan);
 
-        // Convertir el préstamo actualizado a DTO
-        LoanDTO updatedLoanDTO = modelMapper.map(loan, LoanDTO.class);
-
-        return updatedLoanDTO;
-
+        // Convertir entidad a DTO y devolver
+        return modelMapper.map(loan, LoanDTO.class);
     }
+
+
 
     @Override
     public void delete(Long id) {
-        Loan loan =  loanRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Loan "+ id +" not found"));
+        Loan loan = loanRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan " + id + " not found"));
         loan.setBook(null);
         loan.setMember(null);
         loanRepository.save(loan);

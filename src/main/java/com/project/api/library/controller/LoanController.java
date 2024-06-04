@@ -14,7 +14,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class LoanController {
 
     private final LoanService loanService;
@@ -24,17 +23,17 @@ public class LoanController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ){
-        Page<LoanDTO> loanDTO= loanService.findAll(PageRequest.of(page, size));
-        return ResponseEntity.ok().body(loanDTO);
+        Page<LoanDTO> loans = loanService.findAll(PageRequest.of(page, size));
+        return ResponseEntity.ok().body(loans);
 
     }
 
-    @GetMapping("/loan/{id}")
+   @GetMapping("/loan/{id}")
     public Optional<LoanDTO> findById(@PathVariable Long id){
         return loanService.findById(id);
     }
 
-    @PostMapping("/loan")
+   @PostMapping("/loan")
     public ResponseEntity<LoanDTO> save(@Valid @RequestBody LoanDTO loanDTO) {
         LoanDTO savedLoanDTO = loanService.save(loanDTO);
         return ResponseEntity.ok().body(savedLoanDTO);
@@ -50,7 +49,7 @@ public class LoanController {
     @DeleteMapping("/loan/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         loanService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
