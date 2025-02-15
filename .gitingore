@@ -1,1 +1,5 @@
+# Ignorar archivos de configuración de IntelliJ IDEA
+.idea/
+
+# Fichero de variables
 .env/
