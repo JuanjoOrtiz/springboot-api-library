@@ -1,5 +1,9 @@
 # Ignorar archivos de configuración de IntelliJ IDEA
 .idea/
 
+# Directorio de compilación de Maven/Gradle
+target/
+build/
+
 # Fichero de variables
 .env/
