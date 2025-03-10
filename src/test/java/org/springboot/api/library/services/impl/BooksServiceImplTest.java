@@ -151,7 +151,6 @@ class BooksServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> booksService.updateBook(0L, testBookDTO));
     }
 
-    // deleteBook tests
     @Test
     void deleteBook_Success_DeletesBook() {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(testBook));

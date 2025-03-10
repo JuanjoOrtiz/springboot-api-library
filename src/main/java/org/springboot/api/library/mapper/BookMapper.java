@@ -6,12 +6,6 @@ import org.springboot.api.library.dtos.BookDTO;
 import org.springboot.api.library.entities.Book;
 
 @Mapper
-public interface BookMapper {
+public interface BookMapper extends GenericMapper<Book, BookDTO> {
     BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
-
-    // Convierte de Book a BookDTO
-    BookDTO toDTO(Book book);
-
-    // Convierte de BookDTO a Book
-    Book toEntity(BookDTO bookDTO);
 }
