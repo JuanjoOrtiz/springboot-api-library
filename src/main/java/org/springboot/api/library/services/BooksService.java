@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface BooksService {
     Page<BookDTO> getAllBooks(Pageable pageable);
     Optional<BookDTO> getBookById(Long id);
+    Optional<BookDTO> getBookByTitleOrISBN(String searchTerm);
     BookDTO createBook(BookDTO bookDTO);
     BookDTO updateBook(Long id, BookDTO updatedBookDTO);
     void deleteBook(Long id);
