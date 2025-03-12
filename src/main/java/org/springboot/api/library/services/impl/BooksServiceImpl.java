@@ -107,10 +107,10 @@ public class BooksServiceImpl implements BooksService {
             book.setAuthor(bookDTO.author());
             book.setIsbn(bookDTO.isbn());
             book.setPublisher(bookDTO.publisher());
-            book.setPublication_year(bookDTO.publicationYear());
+            book.setPublicationDate(bookDTO.publicationDate());
             book.setCategory(bookDTO.category());
-            book.setAvailable_quantity(bookDTO.availableQuantity());
-            book.setRoute_image(bookDTO.routeImage());
+            book.setAvailableQuantity(bookDTO.availableQuantity());
+            book.setRouteImage(bookDTO.routeImage());
         };
 
         return bookRepository.findById(id)

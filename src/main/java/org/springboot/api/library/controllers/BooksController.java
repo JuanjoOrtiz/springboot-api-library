@@ -60,8 +60,8 @@ public class BooksController {
         }
     }
 
-    @GetMapping("/{searchTerm}")
-    public ResponseEntity<BookDTO> getBookByTitleOrISBN(@PathVariable("searchTerm") String searchTerm) {
+    @GetMapping(value = "/searchTerm", params = "searchTerm")
+    public ResponseEntity<BookDTO> getBookByTitleOrISBN(@RequestParam("searchTerm") String searchTerm) {
         try {
             log.info("Starting search for book with title or ISBN: {}", searchTerm);
             return booksService.getBookByTitleOrISBN(searchTerm)
@@ -125,7 +125,8 @@ public class BooksController {
             booksService.deleteBook(id);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
-            throw e;
+            log.error("Book with id {} not found: ",e.getMessage());
+            throw new DeletionException(STR."Book with id \{id} not found: \{e.getMessage()}");
         } catch (Exception e) {
             log.error("Error deleting book with id {}: {}", id, e.getMessage());
             throw new DeletionException(STR."Error deleting book with id \{id}: \{e.getMessage()}");
