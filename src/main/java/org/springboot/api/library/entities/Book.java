@@ -1,5 +1,6 @@
 package org.springboot.api.library.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -33,14 +34,17 @@ public class Book {
     private String  publisher;
     @NotNull(message = "Publication year cannot be null")
     @PastOrPresent(message = "Publication year cannot be in the future")
-    private LocalDate publication_year;
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    @Column(name = "publication_date")
+    private LocalDate publicationDate;
     @NotBlank(message = "Category cannot be blank")
     @Size(min = 1, max = 50, message = "Category must be between 1 and 50 characters")
     private String category;
     @NotNull(message = "Available quantity cannot be null")
     @Min(value = 0, message = "Available quantity cannot be negative")
-    private int available_quantity;
+    private int availableQuantity;
     @Size(max = 255, message = "Route image path must not exceed 255 characters")
-    private String route_image;
+    @Column(name = "route_image")
+    private String routeImage;
 
 }
