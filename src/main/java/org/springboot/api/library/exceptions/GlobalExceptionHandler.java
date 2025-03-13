@@ -121,7 +121,6 @@ public class GlobalExceptionHandler {
 
         errors.put("message", "Validation failed");
         errors.put("errors", fieldErrors);
-        errors.put("path", "/api/books");
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
@@ -140,4 +139,6 @@ public class GlobalExceptionHandler {
         ex.printStackTrace(); // Considerar usar un logger en producción
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 }

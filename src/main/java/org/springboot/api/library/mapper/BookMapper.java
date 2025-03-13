@@ -48,4 +48,5 @@ public interface BookMapper {
     default String mapLocalDateToString(LocalDate date) {
         return (date != null) ? date.format(FORMATTER) : null;
     }
+
 }

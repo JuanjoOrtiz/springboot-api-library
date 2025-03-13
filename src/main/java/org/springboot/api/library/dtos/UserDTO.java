@@ -1,16 +1,19 @@
 package org.springboot.api.library.dtos;
 
-import java.time.LocalDate;
+import jakarta.validation.constraints.Pattern;
 
 public record UserDTO(
 
-        String userNumber,
+
         String firstName,
         String lastName,
-        String dni,
-        LocalDate createAt,
         String email,
-        int password
+
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+                message = "The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+        )
+        String password
      ) {
 
 }
