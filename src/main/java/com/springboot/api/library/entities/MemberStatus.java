@@ -1,6 +1,6 @@
 package com.springboot.api.library.entities;
 
-public enum Status {
+public enum MemberStatus {
 ACTIVE , SUSPENDED, INACTIVE
 
 }
