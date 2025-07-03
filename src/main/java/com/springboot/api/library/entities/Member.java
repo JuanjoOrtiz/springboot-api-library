@@ -31,8 +31,6 @@ public class Member {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
     @Column(nullable = false)
-    private LocalDateTime createAt;
-    @Column(nullable = false)
     private MemberStatus memberStatus;
     @Column(nullable = false)
     private int  maxBooksAllowed;
