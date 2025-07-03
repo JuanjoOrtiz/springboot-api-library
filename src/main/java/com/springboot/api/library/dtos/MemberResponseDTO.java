@@ -1,6 +1,6 @@
 package com.springboot.api.library.dtos;
 
-import com.springboot.api.library.entities.Status;
+import com.springboot.api.library.entities.MemberStatus;
 import com.springboot.api.library.entities.User;
 
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ public record MemberResponseDTO(
         String phone,
         LocalDate dateOfBirth,
         LocalDateTime createAt,
-        Status status,
+        MemberStatus status,
         int  maxBooksAllowed,
         User user
 ) {

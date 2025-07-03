@@ -4,12 +4,12 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-public interface GenericMapper<E,D> {
+public interface GenericMapper<E,RQ,RS> {
 
-    D toDTO(E entity);
-    E toEntity(D dto);
+    RS toDTO(E entity);
+    E toEntity(RQ requestDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy  = NullValuePropertyMappingStrategy.IGNORE )
-    void updateEntityFromDto(D dto, @MappingTarget E entity);
+    void updateEntityFromDto(RQ requestDto, @MappingTarget E entity);
 
 }
