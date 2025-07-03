@@ -33,7 +33,7 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime createAt;
     @Column(nullable = false)
-    private Status status;
+    private MemberStatus memberStatus;
     @Column(nullable = false)
     private int  maxBooksAllowed;
     @OneToOne(mappedBy = "member")
