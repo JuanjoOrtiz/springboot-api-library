@@ -11,8 +11,9 @@ public interface BookService {
 
     Page<BookResponseDTO> findAll(Pageable pageable);
     Optional<BookResponseDTO> findById(Long id);
+    Optional<BookResponseDTO> findByIsbn(String isbn);
     BookResponseDTO create(BookRequestDTO bookRequestDTO);
     BookResponseDTO update(BookRequestDTO bookRequestDTO, Long id);
-    void delete(Long id);
+    boolean delete(Long id);
 
 }
