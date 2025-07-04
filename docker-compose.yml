@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql
+    container_name: mysql_library
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: library
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data_library:/var/lib/mysql
+
+volumes:
+  db_data_library:
