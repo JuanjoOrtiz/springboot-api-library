@@ -1,11 +1,14 @@
 package com.springboot.api.library.controllers;
 
 
+import com.springboot.api.library.dtos.BookRequestDTO;
 import com.springboot.api.library.dtos.BookResponseDTO;
 import com.springboot.api.library.services.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,12 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -50,28 +48,98 @@ public class BookController {
             return ResponseEntity.ok(books);
         } catch (Exception e) {
             log.error("Error occurred while fetching books", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
     }
-
+    @Operation(summary = "Get Book by ID", description = "Retrieve a book by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book found and returned"),
+            @ApiResponse(responseCode = "404", description = "Book not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> findBookById(@PathVariable Long id) {
         try {
-            log.info("Fetching Book by Id" + id);
+            log.info("Fetching Book by Id: {}", id);
 
-            Optional<BookResponseDTO> book = bookService.findById(id);
-            if (book.isPresent()) {
-                return ResponseEntity.status(HttpStatus.OK).body(book);
-            }
-
-
+            return bookService.findById(id)
+                    .map(book -> {
+                        log.info("Book found with id: {}", id);
+                        return ResponseEntity.ok(book);
+                    })
+                    .orElseGet(() -> {
+                        log.info("Book not found with id: {}", id);
+                        return ResponseEntity.notFound().build();
+                    });
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while fetching book with id: {}", id, e);
+            return ResponseEntity.internalServerError().build();
         }
-
-
-        return null;
+    }
+    @Operation(summary = "Create a new Book", description = "Create a new book entry")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Book created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PostMapping
+    public ResponseEntity<BookResponseDTO> createBook(@Valid @RequestBody BookRequestDTO bookRequest) {
+        try {
+            log.info("Creating new book: {}", bookRequest);
+            BookResponseDTO createdBook = bookService.create(bookRequest);
+            log.info("Book created successfully with id: {}", createdBook.id());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+        } catch (Exception e) {
+            log.error("Error occurred while creating book", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
+    @Operation(summary = "Update a Book", description = "Update an existing book by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Book not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<BookResponseDTO> updateBook(
+            @PathVariable Long id,
+            @Valid @RequestBody BookRequestDTO bookRequestDto) {
+        try {
+            log.info("Updating book with id: {}", id);
+            BookResponseDTO updatedBook = bookService.update(bookRequestDto, id);
+            log.info("Book updated successfully with id: {}", id);
+            return ResponseEntity.ok(updatedBook);
+        } catch (EntityNotFoundException e) {
+            log.warn("Book not found for update with id: {}", id);
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error occurred while updating book with id: {}", id, e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    @Operation(summary = "Delete a Book", description = "Delete a book by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Book deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Book not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        try {
+            log.info("Deleting book with id: {}", id);
+            if (bookService.delete(id)) {
+                log.info("Book deleted successfully with id: {}", id);
+                return ResponseEntity.noContent().build();
+            } else {
+                log.info("Book not found for deletion with id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while deleting book with id: {}", id, e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 }
