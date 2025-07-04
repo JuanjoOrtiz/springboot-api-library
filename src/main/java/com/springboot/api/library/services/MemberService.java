@@ -2,7 +2,6 @@ package com.springboot.api.library.services;
 
 import com.springboot.api.library.dtos.MemberRequestDTO;
 import com.springboot.api.library.dtos.MemberResponseDTO;
-import com.springboot.api.library.entities.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,5 +12,5 @@ public interface MemberService {
     Optional<MemberResponseDTO> findById(Long id);
     MemberResponseDTO create(MemberRequestDTO memberRequestDTO);
     MemberResponseDTO update(MemberRequestDTO memberRequestDTO, Long id);
-    void delete(Long id);
+    boolean delete(Long id);
 }
