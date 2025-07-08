@@ -13,7 +13,7 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface LoanMapper extends  GenericMapper<Loan,LoanRequestDTO,LoanResponseDTO>{
+public interface LoanMapper {
     @Mapping(source = "checkoutDate", target = "checkoutDate", dateFormat = "dd/MM/yyyy HH:mm:ss")
     @Mapping(source = "dueDate", target = "dueDate", dateFormat = "dd/MM/yyyy")
     @Mapping(source = "returnDate", target = "returnDate", dateFormat = "dd/MM/yyyy HH:mm:ss") LoanResponseDTO toDTO(Loan entity);
