@@ -3,24 +3,19 @@ package com.springboot.api.library.mappers;
 import com.springboot.api.library.dtos.MemberRequestDTO;
 import com.springboot.api.library.dtos.MemberResponseDTO;
 import com.springboot.api.library.entities.Member;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface MemberMapper extends GenericMapper<Member, MemberRequestDTO, MemberResponseDTO> {
+public interface MemberMapper {
 
-    @Override
-    public MemberResponseDTO toDTO(Member entity);
+    MemberResponseDTO toDTO(Member entity);
 
-    @Override
-    public Member toEntity(MemberRequestDTO requestDto);
+    Member toEntity(MemberRequestDTO requestDto);
 
-    @Override
-    public void updateEntityFromDto(MemberRequestDTO requestDto, Member entity);
+    void updateEntityFromDto(MemberRequestDTO requestDto, @MappingTarget Member entity);
+
 }

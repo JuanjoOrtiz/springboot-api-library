@@ -10,14 +10,13 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface BookMapper extends GenericMapper<Book, BookRequestDTO, BookResponseDTO> {
+public interface BookMapper {
 
     @Mapping(source = "publicationYear", target = "publicationYear", dateFormat = "dd/MM/yyyy")
     public BookResponseDTO toDTO(Book entity);
 
     @Mapping(target = "id", ignore = true)
     public Book toEntity(BookRequestDTO requestDTO);
-
 
     public void updateEntityFromDto(BookRequestDTO requestDTO,@MappingTarget Book entity);
 }
