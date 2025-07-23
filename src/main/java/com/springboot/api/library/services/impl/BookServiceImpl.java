@@ -27,7 +27,8 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public Page<BookResponseDTO> findAll(Pageable pageable) {
         log.debug("Fetching all books with pagination: {}", pageable);
-       return bookRepository.findAll(pageable).map(bookMapper::toDTO);
+       return bookRepository.findAll(pageable)
+               .map(bookMapper::toDTO);
     }
 
     @Override

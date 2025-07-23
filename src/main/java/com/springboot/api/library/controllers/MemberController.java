@@ -3,9 +3,7 @@ package com.springboot.api.library.controllers;
 import com.springboot.api.library.dtos.MemberRequestDTO;
 import com.springboot.api.library.dtos.MemberResponseDTO;
 import com.springboot.api.library.services.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @Operation(summary = "Get all members", description = "Retrieve a paginated list of all members")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of members retrieve successfully"),
-            @ApiResponse(responseCode = "204", description = "members not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
-    })
+
     @GetMapping
     public ResponseEntity<Page<?>> findAllMembers(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
         try {
@@ -48,12 +41,7 @@ public class MemberController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Get member by ID", description = "Retrieve a member by its unique identifier")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Member found and returned"),
-            @ApiResponse(responseCode = "404", description = "Member not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findMemberById(@PathVariable Long id) {
         try {
@@ -73,12 +61,7 @@ public class MemberController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Create a new member", description = "Create a new member entry")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "member created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PostMapping
     public ResponseEntity<MemberResponseDTO> createMember(@Valid @RequestBody MemberRequestDTO memberRequestDto) {
         try {
@@ -92,13 +75,7 @@ public class MemberController {
         }
     }
 
-    @Operation(summary = "Update a member", description = "Update an existing member by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Member updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Member not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PutMapping("/{id}")
     public ResponseEntity<MemberResponseDTO> updateMember(
             @PathVariable Long id,
@@ -116,12 +93,7 @@ public class MemberController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Delete a member", description = "Delete a member by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Member deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Member not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
         try {
