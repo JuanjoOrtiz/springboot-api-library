@@ -4,9 +4,6 @@ package com.springboot.api.library.controllers;
 import com.springboot.api.library.dtos.BookRequestDTO;
 import com.springboot.api.library.dtos.BookResponseDTO;
 import com.springboot.api.library.services.BookService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +24,7 @@ public class BookController {
 
     private final BookService bookService;
 
-    @Operation(summary = "Get all Books", description = "Retrieve a paginated list of all books")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of Books retrieve successfully"),
-            @ApiResponse(responseCode = "204", description = "Books not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
-    })
+
     @GetMapping
     public ResponseEntity<Page<?>> findAllBooks(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
         try {
@@ -51,12 +43,7 @@ public class BookController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Get Book by ID", description = "Retrieve a book by its unique identifier")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Book found and returned"),
-            @ApiResponse(responseCode = "404", description = "Book not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findBookById(@PathVariable Long id) {
         try {
@@ -76,12 +63,7 @@ public class BookController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Create a new Book", description = "Create a new book entry")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Book created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PostMapping
     public ResponseEntity<BookResponseDTO> createBook(@Valid @RequestBody BookRequestDTO bookRequest) {
         try {
@@ -95,13 +77,7 @@ public class BookController {
         }
     }
 
-    @Operation(summary = "Update a Book", description = "Update an existing book by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Book updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Book not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PutMapping("/{id}")
     public ResponseEntity<BookResponseDTO> updateBook(
             @PathVariable Long id,
@@ -119,12 +95,8 @@ public class BookController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Delete a Book", description = "Delete a book by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Book deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Book not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         try {

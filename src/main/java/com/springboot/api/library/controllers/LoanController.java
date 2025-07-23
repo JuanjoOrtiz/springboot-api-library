@@ -3,9 +3,7 @@ package com.springboot.api.library.controllers;
 import com.springboot.api.library.dtos.LoanRequestDTO;
 import com.springboot.api.library.dtos.LoanResponseDTO;
 import com.springboot.api.library.services.LoanService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoanController {
     private final LoanService loanService;
 
-    @Operation(summary = "Get all loans", description = "Retrieve a paginated list of all loans")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of loans retrieve successfully"),
-            @ApiResponse(responseCode = "204", description = "Loans not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
-    })
+
     @GetMapping
     public ResponseEntity<Page<?>> findAllLoans(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
         try {
@@ -48,12 +41,7 @@ public class LoanController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Get loan by ID", description = "Retrieve a loan by its unique identifier")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "loan found and returned"),
-            @ApiResponse(responseCode = "404", description = "loan not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findloanById(@PathVariable Long id) {
         try {
@@ -73,12 +61,7 @@ public class LoanController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Create a new loan", description = "Create a new loan entry")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "loan created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PostMapping
     public ResponseEntity<LoanResponseDTO> createloan(@Valid @RequestBody LoanRequestDTO loanRequest) {
         try {
@@ -92,13 +75,7 @@ public class LoanController {
         }
     }
 
-    @Operation(summary = "Update a loan", description = "Update an existing loan by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Loan updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Loan not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @PutMapping("/{id}")
     public ResponseEntity<LoanResponseDTO> updateloan(
             @PathVariable Long id,
@@ -116,12 +93,7 @@ public class LoanController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @Operation(summary = "Delete a loan", description = "Delete a loan by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "loan deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "loan not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteloan(@PathVariable Long id) {
         try {
